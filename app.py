@@ -748,9 +748,9 @@ def create_folders():
     for folder in [UPLOAD_FOLDER, RESULT_FOLDER]:
         if not os.path.exists(folder):
             os.makedirs(folder)
-
+create_folders()
 if __name__ == '__main__':
-    create_folders()
+    
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
 
