@@ -1,12 +1,31 @@
+
 import os
 import cv2
+import gdown
 from flask import Flask, request, redirect, url_for, render_template_string, send_from_directory
 from ultralytics import YOLO
+
+# ─── New: Google Drive Download Logic ────────────────────────────────────────
+# 1) RAW Drive file ID:
+DRIVE_FILE_ID = '1B0FfStSYKtdQ8Hh9UfyXWMHLzvbcid41'
+# 2) Construct the “export=download” URL for gdown:
+DRIVE_URL = f'https://drive.google.com/uc?export=download&id={DRIVE_FILE_ID}'
+# 3) Local filename we want:
+LOCAL_MODEL_PATH = 'best.onnx'
+
+# If the ONNX model isn't already on disk, download it from Drive:
+if not os.path.exists(LOCAL_MODEL_PATH):
+    print(f"→ Downloading ONNX model from Google Drive to '{LOCAL_MODEL_PATH}' …")
+    # gdown will handle large-file tokens automatically.
+    gdown.download(DRIVE_URL, LOCAL_MODEL_PATH, quiet=False)
+    print("✔ Download complete.")
+
+# ─── End of Download Logic ────────────────────────────────────────────────────
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 RESULT_FOLDER = 'static/results'
-MODEL_PATH = r'best.onnx'
+MODEL_PATH = LOCAL_MODEL_PATH    # now points to the downloaded file
 
 # Create the Flask app
 app = Flask(__name__)
@@ -15,6 +34,7 @@ app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
 # Load the YOLO ONNX model using Ultralytics
 model = YOLO(MODEL_PATH)
+
 
 # Enhanced HTML templates with modern styling
 index_html = '''
